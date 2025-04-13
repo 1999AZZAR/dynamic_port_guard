@@ -1,0 +1,18 @@
+# Configuration for Dynamic Port Guard
+
+# Whitelist: Space-separated list of ports to always allow.
+# Format: proto:port (e.g., "tcp:22 udp:53")
+WHITELIST="tcp:22 tcp:80 tcp:443"
+
+# Check Interval: How often (in seconds) to check for listening ports.
+CHECK_INTERVAL=10
+
+# Firewall Tool: Currently only 'iptables' is fully implemented.
+# Options: iptables, (nftables, ufw - require implementation in script)
+FIREWALL_TOOL="iptables"
+
+# Log File: Path for operational logs.
+LOG_FILE="/var/log/dynamic_ports.log"
+
+# Dedicated Chain Name (iptables/ip6tables)
+IPTABLES_CHAIN="PORTGUARD_ALLOW"
