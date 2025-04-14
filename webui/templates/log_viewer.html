@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Log Viewer - Dynamic Port Guard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* Ensure container allows log box to use viewport height */
+        body, html { height: 100%; }
+        .container { display: flex; flex-direction: column; min-height: 95vh; }
+        .log-container { flex-grow: 1; display: flex; flex-direction: column; }
+        .log-container .log-box { flex-grow: 1; height: auto; /* Override fixed height */}
+        .log-header { margin-bottom: 1rem; }
+        .log-footer { margin-top: 1.5rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="log-header">
+            <h1>Log Viewer</h1>
+            <p>Displaying recent lines from <code>{{ log_file }}</code></p>
+        </div>
+        <div class="log-container">
+             {# Logs escaped in Python, mark safe #}
+             <div class="log-box">
+                {{ logs | safe }}
+             </div>
+        </div>
+        <div class="log-footer">
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+     {# Optional: Add Bootstrap JS if any components need it #}
+     {# <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> #}
+</body>
+</html>

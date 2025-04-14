@@ -1,0 +1,467 @@
+/* styles.css */
+
+/* --- Variables (Material You Inspired Dark Palette) --- */
+:root {
+  --background-color: #1c1b1f; /* Slightly off-black */
+  --surface-color: #2c2b30;    /* Card/Input backgrounds */
+  --surface-variant-color: #49454e; /* Borders, dividers */
+  --primary-color: #d0bcff;     /* Primary accent (buttons, highlights) */
+  --primary-hover-color: #e1d1ff;
+  --secondary-color: #ccc2dc;   /* Secondary elements */
+  --error-color: #f2b8b5;       /* Danger/Error text */
+  --error-container-color: #601410; /* Danger/Error background */
+  --warning-color: #fcdb99;      /* Warning text */
+  --warning-container-color: #5e4200; /* Warning background */
+  --success-color: #b7f3b3;      /* Success text */
+  --success-container-color: #0f530e; /* Success background */
+  --info-color: #a0cfff;        /* Info text */
+  --info-container-color: #004a77; /* Info background */
+  --on-background-color: #e6e1e5; /* Text on background */
+  --on-surface-color: #e6e1e5;    /* Text on surface */
+  --on-surface-variant-color: #cac4d0; /* Dimmer text */
+  --on-primary-color: #381e72;    /* Text on primary button */
+  --on-error-color: #ffffff; /* Text on error button */
+  --on-warning-color: #3d2f00; /* Text on warning button */
+  --on-success-color: #00390a; /* Text on success button */
+
+  --code-font: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  --body-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --border-radius: 12px; /* Softer corners */
+  --card-padding: 1.5rem;
+  --element-spacing: 1rem;
+  --section-spacing: 2.5rem;
+}
+
+/* --- Base & Typography --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+    font-size: 16px; /* Base font size */
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--on-background-color);
+  font-family: var(--body-font);
+  margin: 0;
+  padding-top: var(--section-spacing);
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+  color: var(--on-surface-color);
+}
+
+h1 { font-size: 2.25rem; margin-bottom: var(--section-spacing); text-align: center; }
+h2 { font-size: 1.5rem; margin-bottom: var(--element-spacing); padding-bottom: 0.5rem; border-bottom: 1px solid var(--surface-variant-color); }
+h2 small { font-size: 0.8em; color: var(--on-surface-variant-color); font-weight: 400; }
+h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--primary-hover-color);
+  text-decoration: underline;
+}
+
+code {
+  font-family: var(--code-font);
+  background-color: var(--surface-variant-color);
+  color: var(--on-surface-variant-color);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+small {
+    font-size: 0.85em;
+}
+
+/* --- Layout Sections --- */
+.section {
+  margin-bottom: var(--section-spacing);
+}
+
+.grid-container, .service-status-grid, .config-grid {
+  display: grid;
+  gap: var(--element-spacing);
+}
+
+/* --- Cards --- */
+.card {
+  background-color: var(--surface-color);
+  border-radius: var(--border-radius);
+  padding: var(--card-padding);
+  border: 1px solid var(--surface-variant-color);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.15);
+  margin-bottom: var(--element-spacing); /* Add space below cards */
+}
+
+.card-header {
+  padding: 0 0 var(--element-spacing) 0;
+  margin-bottom: var(--element-spacing);
+  border-bottom: 1px solid var(--surface-variant-color);
+  background: none;
+}
+.card-header h2 {
+  border-bottom: none; /* Remove default h2 border inside card header */
+  margin-bottom: 0;
+}
+
+.card-body {
+  padding: 0;
+}
+
+/* --- Forms --- */
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--on-surface-variant-color);
+}
+
+.form-control,
+.form-select {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--on-surface-color);
+  background-color: var(--background-color); /* Slightly darker than card */
+  background-clip: padding-box;
+  border: 1px solid var(--surface-variant-color);
+  appearance: none; /* remove default system look */
+  border-radius: 8px; /* Slightly smaller radius for inputs */
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.form-control:focus,
+.form-select:focus {
+  color: var(--on-surface-color);
+  background-color: var(--background-color);
+  border-color: var(--primary-color);
+  outline: 0;
+  box-shadow: 0 0 0 2px rgba(var(--primary-color), 0.25); /* Use primary color for focus */
+}
+
+.form-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23cac4d0' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+}
+
+select[disabled],
+input[disabled] {
+    background-color: var(--surface-variant-color);
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+option[disabled] {
+    color: var(--on-surface-variant-color);
+    font-style: italic;
+}
+
+.form-group {
+  margin-bottom: var(--element-spacing);
+}
+
+.form-text {
+    font-size: 0.8em;
+    color: var(--on-surface-variant-color);
+    margin-top: 0.25rem;
+}
+
+.form-actions {
+    margin-top: calc(var(--element-spacing) * 1.5);
+}
+
+
+/* --- Buttons --- */
+.btn {
+  display: inline-block;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border-radius: 20px; /* Pill shape */
+  transition: background-color .15s ease-in-out, box-shadow .15s ease-in-out, color .15s ease-in-out, border-color .15s ease-in-out;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem; /* Add spacing below buttons if they wrap */
+}
+
+.btn:focus {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(var(--primary-color), 0.4);
+}
+.btn:hover {
+    filter: brightness(1.1); /* General hover effect */
+}
+
+
+/* Specific Button Colors */
+.btn-primary { background-color: var(--primary-color); color: var(--on-primary-color); }
+.btn-primary:hover { background-color: var(--primary-hover-color); }
+
+.btn-secondary { background-color: var(--secondary-color); color: var(--on-primary-color); /* Adjust text color if needed */ }
+.btn-secondary:hover { filter: brightness(1.1); }
+
+.btn-success { background-color: var(--success-container-color); color: var(--success-color); border: 1px solid var(--success-color); }
+.btn-success:hover { background-color: hsl(117, 68%, 25%); } /* Simple darken */
+
+.btn-danger { background-color: var(--error-container-color); color: var(--error-color); border: 1px solid var(--error-color); }
+.btn-danger:hover { background-color: hsl(3, 76%, 20%); } /* Darker danger */
+
+.btn-warning { background-color: var(--warning-container-color); color: var(--warning-color); border: 1px solid var(--warning-color); }
+.btn-warning:hover { background-color: hsl(41, 100%, 20%); } /* Darker warning */
+
+.btn-info { background-color: var(--info-container-color); color: var(--info-color); border: 1px solid var(--info-color); }
+.btn-info:hover { filter: brightness(1.2); }
+
+/* Small Button Variant */
+.btn-sm {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  border-radius: 15px; /* Keep pill shape */
+}
+
+/* --- Service Control & Status Section --- */
+.service-status-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive columns */
+}
+
+.status-box {
+    background-color: var(--background-color); /* Darker background */
+    border: 1px solid var(--surface-variant-color);
+    padding: var(--element-spacing);
+    min-height: 150px; /* Use min-height */
+    max-height: 250px; /* Prevent excessive height */
+    overflow-y: auto;
+    font-family: var(--code-font);
+    font-size: 0.85em;
+    white-space: pre-wrap; /* Allow wrapping */
+    word-break: break-word;
+    color: var(--on-surface-variant-color);
+    border-radius: 8px;
+}
+
+.service-actions {
+    display: flex;
+    flex-wrap: wrap; /* Allow buttons to wrap */
+    gap: 0.5rem; /* Space between buttons */
+}
+.service-actions form {
+    display: inline-block; /* Keep forms inline */
+    margin: 0;
+}
+
+/* --- Configuration Section --- */
+.config-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+/* --- Table --- */
+.table-responsive {
+  overflow-x: auto; /* Allow horizontal scroll on small screens */
+  margin-bottom: var(--element-spacing);
+  border: 1px solid var(--surface-variant-color);
+  border-radius: 8px;
+}
+
+.table {
+  width: 100%;
+  margin-bottom: 0; /* Remove margin as container handles it */
+  color: var(--on-surface-color);
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 0.8rem 1rem; /* Adjust padding */
+  vertical-align: middle; /* Align vertically */
+  border-top: 1px solid var(--surface-variant-color);
+  text-align: left;
+  line-height: 1.4; /* Improve readability */
+}
+
+.table thead th {
+  vertical-align: bottom;
+  border-bottom: 2px solid var(--surface-variant-color);
+  color: var(--on-surface-variant-color);
+  font-weight: 500;
+  white-space: nowrap; /* Prevent headers from wrapping */
+}
+
+/* Remove border from first row */
+.table tbody tr:first-child td {
+    border-top: none;
+}
+
+/* Add subtle hover effect to rows */
+.table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.04); /* Very subtle hover */
+}
+
+/* Table Actions Cell */
+.table td.actions {
+  white-space: nowrap; /* Prevent buttons from wrapping */
+  text-align: center;
+  padding: 0.5rem 0.8rem; /* Reduce padding slightly for buttons */
+}
+
+.table td.actions form {
+  margin: 0;
+  padding: 0;
+}
+
+
+/* Optional: Style for whitelisted rows */
+.table tbody tr.whitelisted-row {
+  background-color: rgba(var(--primary-color), 0.06); /* Subtle primary tint */
+  /* border-left: 3px solid var(--primary-color); */ /* Alternative: left border */
+}
+.table tbody tr.whitelisted-row td:first-child {
+    /* Optional: Add visual indicator */
+    /* border-left: 3px solid var(--primary-color); */
+    /* margin-left: -3px; */ /* Adjust if using border */
+}
+.table tbody tr.whitelisted-row:hover {
+  background-color: rgba(var(--primary-color), 0.12); /* Slightly stronger hover */
+}
+
+
+/* --- Log Box --- */
+.log-box {
+  background-color: var(--background-color);
+  border: 1px solid var(--surface-variant-color);
+  padding: var(--element-spacing);
+  height: 350px; /* Default height */
+  overflow-y: scroll;
+  font-family: var(--code-font);
+  font-size: 0.85em;
+  white-space: pre; /* Preserve whitespace and line breaks */
+  color: var(--on-surface-variant-color);
+  border-radius: 8px;
+}
+/* Log Viewer Specific Height */
+.log-container .log-box {
+    height: 70vh; /* Taller for dedicated view */
+}
+
+/* --- Flash Messages / Alerts --- */
+.flash-messages {
+  margin-bottom: var(--element-spacing);
+}
+
+.alert {
+  position: relative;
+  padding: 1rem 1.25rem; /* Adjust padding */
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Keep Bootstrap's JS dismissal button classes for compatibility */
+.alert-dismissible .btn-close {
+  padding: 1.25rem 1rem;
+  background: transparent;
+  border: 0;
+  color: inherit; /* Inherit color from parent alert */
+  opacity: 0.7;
+  font-size: 1.2rem;
+  margin-left: 1rem; /* Add space between message and button */
+}
+.alert-dismissible .btn-close:hover {
+    opacity: 1;
+}
+
+/* Alert Colors using CSS Variables */
+.alert-success { color: var(--success-color); background-color: var(--success-container-color); border-color: rgba(var(--success-color), 0.5); }
+.alert-danger { color: var(--error-color); background-color: var(--error-container-color); border-color: rgba(var(--error-color), 0.5); }
+.alert-warning { color: var(--warning-color); background-color: var(--warning-container-color); border-color: rgba(var(--warning-color), 0.5); }
+.alert-info { color: var(--info-color); background-color: var(--info-container-color); border-color: rgba(var(--info-color), 0.5); }
+/* Add primary/secondary if needed */
+.alert-primary { color: var(--primary-color); background-color: rgba(var(--primary-color), 0.2); border-color: rgba(var(--primary-color), 0.5); }
+.alert-secondary { color: var(--secondary-color); background-color: rgba(var(--secondary-color), 0.2); border-color: rgba(var(--secondary-color), 0.5); }
+
+
+/* --- Utility Classes (Replicating necessary Bootstrap classes) --- */
+.mb-3 { margin-bottom: var(--element-spacing) !important; }
+.mb-4 { margin-bottom: calc(var(--element-spacing) * 1.5) !important; }
+.mb-5 { margin-bottom: calc(var(--element-spacing) * 2.5) !important; }
+.me-2 { margin-right: 0.5rem !important; }
+.ms-auto { margin-left: auto !important; }
+.d-inline { display: inline !important; }
+.d-inline-block { display: inline-block !important; }
+.d-block { display: block !important; }
+.d-flex { display: flex !important; }
+.justify-content-between { justify-content: space-between !important; }
+.align-items-center { align-items: center !important; }
+.text-center { text-align: center !important; }
+.text-start { text-align: left !important; }
+.text-end { text-align: right !important; }
+.w-100 { width: 100% !important; }
+
+/* --- Responsiveness --- */
+@media (max-width: 768px) {
+    h1 { font-size: 1.8rem; }
+    h2 { font-size: 1.3rem; }
+    .card { padding: var(--element-spacing); }
+    .container { padding: 0 10px; }
+    :root { --section-spacing: 1.5rem; } /* Reduce section spacing */
+
+    /* Stack grids on smaller screens */
+     .service-status-grid {
+        grid-template-columns: 1fr; /* Stack columns */
+    }
+     .config-grid {
+        grid-template-columns: 1fr; /* Stack columns */
+    }
+
+    .table thead {
+        /* Optionally hide table header on very small screens or use display:block rows */
+    }
+    .table th, .table td {
+        padding: 0.6rem 0.8rem; /* Reduce padding */
+    }
+}
+
+@media (max-width: 576px) {
+    .btn { padding: 0.5rem 1rem; font-size: 0.9rem; } /* Slightly smaller buttons */
+    .table td.actions .btn-sm {
+        display: block; /* Stack action buttons vertically */
+        margin-bottom: 0.3rem;
+        width: 100%;
+    }
+     .table td.actions form {
+         display: block; /* Ensure form takes full width */
+         margin-bottom: 0.3rem;
+     }
+     .table td.actions form:last-child {
+         margin-bottom: 0;
+     }
+}
