@@ -28,10 +28,17 @@ WEBUI_VENV_PATH="${WEBUI_APP_DIR}/venv"
 
 INSTALL_CORE=true
 INSTALL_WEBUI=true
+REINSTALL=false
 
 # --- Argument Parsing ---
 while [[ "$#" -gt 0 ]]; do
     case $1 in
+    --reinstall)
+        REINSTALL=true
+        INSTALL_CORE=true
+        INSTALL_WEBUI=true
+        log_info "Option: Reinstalling both Core and WebUI (removing existing installation)"
+        ;;
     --core-only)
         INSTALL_WEBUI=false
         log_info "Option: Installing Core Service only."
@@ -52,6 +59,12 @@ done
 if [ "$(id -u)" -ne 0 ]; then
     log_error "This script must be run as root. Use sudo ./install.sh"
     exit 1
+fi
+
+# If reinstall requested, remove existing components entirely
+if $REINSTALL; then
+    log_info "Reinstall: running uninstall.sh --remove-config"
+    "$SCRIPT_DIR/uninstall.sh" --remove-config --core-only --webui-only
 fi
 
 # --- Prerequisite Check Function ---
@@ -215,8 +228,11 @@ if $INSTALL_WEBUI; then
     # Source the activate script to use the venv's pip directly and easily
     # Running pip directly is also fine: "$WEBUI_VENV_PATH/bin/pip" install Flask
     source "$WEBUI_VENV_PATH/bin/activate"
-    if pip install Flask; then
-        log_info "Flask installed successfully into virtual environment."
+    # Upgrade pip inside virtual environment
+    python -m pip install --upgrade pip
+    # Install Flask, qrcode, pillow (override PEP668 restrictions)
+    if pip install --break-system-packages Flask qrcode pillow; then
+        log_info "Web UI dependencies installed successfully into virtual environment."
     else
         # Deactivate venv before exiting on error
         deactivate &>/dev/null || true
@@ -293,7 +309,7 @@ EOF
     if [ -n "$INSTALLER_USER_HOME" ] && [ -d "$INSTALLER_USER_HOME" ]; then
         BASHRC_PATH="${INSTALLER_USER_HOME}/.bashrc"
         ZSHRC_PATH="${INSTALLER_USER_HOME}/.zshrc" # Also check zshrc
-        ALIAS_CMD="alias portguard='echo \"[*] Dynamic Port Guard Status:\"; sudo systemctl status ${CORE_SERVICE_NAME} --no-pager; echo; sudo systemctl status ${WEBUI_SERVICE_NAME} --no-pager; echo; echo \"[*] Opening Web UI (http://localhost:6060)...\"; xdg-open http://localhost:6060 &>/dev/null &'"
+        ALIAS_CMD="alias portguard='echo \"[*] Dynamic Port Guard Status:\"; sudo systemctl status ${CORE_SERVICE_NAME} --no-pager; echo; sudo systemctl status ${WEBUI_SERVICE_NAME} --no-pager; echo; echo \"[*] Opening Web UI (http://localhost:6060)...\"; python3 -m webbrowser http://localhost:6060 &>/dev/null &'"
         ALIAS_COMMENT="# Dynamic Port Guard Alias (added by install script)"
         ALIAS_MARKER="alias portguard=" # Used to check existence
 

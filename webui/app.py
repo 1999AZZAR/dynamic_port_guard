@@ -2,10 +2,14 @@ import subprocess
 import os
 import shlex
 import re
-
-# Corrected Imports:
 from flask import Flask, render_template, redirect, url_for, request, flash
 from markupsafe import escape  # Import escape from markupsafe
+import qrcode
+import io
+import base64
+import select
+import time
+import threading
 
 # --- Determine Folders FIRST ---
 # Get the directory where this script resides
@@ -365,6 +369,83 @@ def read_log(lines=50):
         return f"Error reading log file {escape(log_path)}: {escape(str(e))}"
 
 
+# === SHARE PORT STATE & ACTIONS ===
+SHARE_STATE = {}  # maps port to {'proc': Popen, 'url': shared url}
+
+def stop_share(port):
+    """Stop SSH reverse tunnel for given port."""
+    info = SHARE_STATE.get(port)
+    if info:
+        proc = info['proc']
+        pid = proc.pid
+        proc.terminate()
+        del SHARE_STATE[port]
+        return pid, port, info.get('url')
+    return None, None, None
+
+def _monitor_share(port, proc):
+    """Background monitor to update URL if it changes."""
+    pattern = re.compile(r'https?://[A-Za-z0-9-]+\.lhr\.life')
+    while proc.poll() is None:
+        line_bytes = proc.stdout.readline()
+        if not line_bytes:
+            continue
+        line = line_bytes.decode('utf-8', errors='ignore')
+        clean = re.sub(r'\x1b\[[0-9;]*[A-Za-z]', '', line).strip()
+        print(f"[share-debug] monitor output: {clean}")
+        m = pattern.search(clean)
+        if m:
+            new_url = m.group(0)
+            old_url = SHARE_STATE.get(port, {}).get('url')
+            if new_url and new_url != old_url:
+                print(f"[share-debug] URL changed for port {port}: {old_url} -> {new_url}")
+                SHARE_STATE[port]['url'] = new_url
+
+def start_share(port):
+    """Start SSH reverse tunnel for given port and capture URL."""
+    if port in SHARE_STATE and SHARE_STATE[port]['proc'].poll() is None:
+        return SHARE_STATE[port]['url']
+    try:
+        cmd = [
+            'ssh', '-tt',  # force pseudo-tty allocation for interactive shell
+            '-o', 'StrictHostKeyChecking=no',
+            '-o', 'UserKnownHostsFile=/dev/null',
+            '-o', 'ExitOnForwardFailure=yes',
+            '-o', 'ServerAliveInterval=60',
+            '-o', 'ServerAliveCountMax=3',
+            '-R', f'80:localhost:{port}',
+            'nokey@localhost.run',
+        ]
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        url = None
+        start_time = time.time()
+        pattern = re.compile(r'https?://[A-Za-z0-9-]+\.lhr\.life')
+        while time.time() - start_time < 15:
+            if proc.poll() is not None:
+                break
+            rlist, _, _ = select.select([proc.stdout], [], [], 1)
+            if proc.stdout in rlist:
+                line_bytes = proc.stdout.readline()
+                if not line_bytes:
+                    continue
+                line = line_bytes.decode('utf-8', errors='ignore')
+                clean = re.sub(r'\x1b\[[0-9;]*[A-Za-z]', '', line)
+                print(f"[share-debug] SSH output: {clean.strip()}")
+                m = pattern.search(clean)
+                if m:
+                    url = m.group(0)
+                    print(f"[share-debug] extracted URL: {url}")
+                    break
+        if url is None:
+            print("[share-debug] No URL found in SSH output after timeout")
+        SHARE_STATE[port] = {'proc': proc, 'url': url}
+        threading.Thread(target=_monitor_share, args=(port, proc), daemon=True).start()
+        return url
+    except Exception as e:
+        print(f"[share-debug] start_share exception: {e}")
+        return None
+
+
 # --- Flask Routes ---
 
 
@@ -375,6 +456,17 @@ def index():
     # Get status but don't flash messages from here for initial load
     _, status_output = control_service("status")
     logs = read_log(lines=50)
+    # Prepare sharing info
+    share_data = {}
+    for port, info in SHARE_STATE.items():
+        url = info.get('url') or ''
+        img = qrcode.make(url)
+        buf = io.BytesIO()
+        img.save(buf, format='PNG')
+        share_data[port] = {
+            'url': url,
+            'qr': base64.b64encode(buf.getvalue()).decode()
+        }
     return render_template(
         "index.html",
         ports=ports,
@@ -382,7 +474,8 @@ def index():
         service_status=status_output,
         logs=logs,
         core_service_name=CORE_SERVICE_NAME,
-        config_file_path=CONFIG_FILE,  # Pass config path for display
+        config_file_path=CONFIG_FILE,
+        share_data=share_data,
     )
 
 
@@ -554,6 +647,36 @@ def view_log():
     logs = read_log(lines=200)
     # Use the dedicated template
     return render_template("log_viewer.html", logs=logs, log_file=log_path)
+
+
+@app.route("/share/start", methods=["POST"])
+def share_start():
+    port = request.form.get("port")
+    if not port or not port.isdigit():
+        flash("Invalid port for sharing.", "warning")
+        return redirect(url_for("index"))
+    port = int(port)
+    url = start_share(port)
+    if url:
+        flash(f"Port {port} shared at {url}.", "success")
+    else:
+        flash(f"Failed to share port {port}.", "danger")
+    return redirect(url_for("index"))
+
+
+@app.route("/share/stop", methods=["POST"])
+def share_stop():
+    port = request.form.get("port")
+    if not port or not port.isdigit():
+        flash("Invalid port for stopping share.", "warning")
+        return redirect(url_for("index"))
+    port = int(port)
+    pid, _, _ = stop_share(port)
+    if pid is not None:
+        flash(f"Stopped sharing port {port} (PID: {pid}).", "success")
+    else:
+        flash("No active port sharing found.", "info")
+    return redirect(url_for("index"))
 
 
 # --- Main Execution ---

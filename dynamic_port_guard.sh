@@ -1,5 +1,34 @@
 #!/bin/bash
 
+# === SHARE PORT CAPABILITY ===
+SHARE_PORT=""
+SSH_PID=""
+
+usage() {
+    echo "Usage: $0 [--share|-s PORT]"
+    exit 1
+}
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -s|--share)
+            if [[ -z "$2" ]]; then
+                echo "Error: $1 requires a port argument." >&2
+                usage
+            fi
+            SHARE_PORT="$2"
+            shift 2
+            ;;
+        -*)
+            echo "Unknown option: $1" >&2
+            usage
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
 # === CONFIG FILE ===
 CONFIG_FILE="/etc/dynamic-port-guard.conf"
 
@@ -33,6 +62,15 @@ chmod 640 "$LOG_FILE" # Restrict permissions slightly
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
+}
+
+# === SHARE PORT FUNCTION ===
+share_port() {
+    local port="$1"
+    log "Starting port sharing for localhost:$port via localhost.run..."
+    ssh -o ExitOnForwardFailure=yes -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -R 80:localhost:$port nokey@localhost.run &
+    SSH_PID=$!
+    log "SSH remote-forward process started with PID $SSH_PID."
 }
 
 # === FIREWALL FUNCTIONS ===
@@ -135,8 +173,11 @@ cleanup() {
         # nft delete chain inet firewall $IPTABLES_CHAIN
         log "Cleanup skipped: nftables support not implemented."
         ;;
-
     esac
+    if [[ -n "$SSH_PID" ]]; then
+        kill "$SSH_PID" 2>/dev/null || true
+        log "SSH remote-forward process $SSH_PID terminated."
+    fi
     log "Dynamic Port Guard stopped."
     exit 0
 }
@@ -148,6 +189,9 @@ trap cleanup SIGTERM SIGINT
 
 log "Dynamic Port Guard started."
 setup_firewall
+if [[ -n "$SHARE_PORT" ]]; then
+    share_port "$SHARE_PORT"
+fi
 
 while true; do
     # Get currently listening TCP and UDP ports (IPv4 and IPv6)

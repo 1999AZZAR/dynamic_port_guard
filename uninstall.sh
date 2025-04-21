@@ -15,6 +15,7 @@ WEBUI_SERVICE_FILE="/etc/systemd/system/${WEBUI_SERVICE_NAME}.service"
 REMOVE_CORE=true
 REMOVE_WEBUI=true
 REMOVE_CONFIG=false # Ask user about config
+REINSTALL=false
 
 # --- Helper Functions ---
 log_info() { echo "[*] $1"; }
@@ -27,6 +28,11 @@ while [[ "$#" -gt 0 ]]; do
     --core-only) REMOVE_WEBUI=false ;;
     --webui-only) REMOVE_CORE=false ;;
     --remove-config) REMOVE_CONFIG=true ;; # Flag to force config removal
+    --reinstall)
+        REINSTALL=true
+        REMOVE_CONFIG=true
+        log_info "Option: Batch uninstall for reinstall"
+        ;;
     *)
         log_error "Unknown parameter passed: $1"
         exit 1
@@ -62,7 +68,11 @@ if $REMOVE_CORE; then
             log_info "Removing configuration file: ${CORE_CONFIG_FILE}"
             rm -f "$CORE_CONFIG_FILE"
         else
-            read -p "Do you want to remove the configuration file ${CORE_CONFIG_FILE}? [y/N] " -r REPLY
+            if ! $REINSTALL; then
+                read -p "Do you want to remove the configuration file ${CORE_CONFIG_FILE}? [y/N] " -r REPLY
+            else
+                REPLY=Y
+            fi
             echo # Move to new line
             if [[ $REPLY =~ ^[Yy]$ ]]; then
                 log_info "Removing configuration file: ${CORE_CONFIG_FILE}"

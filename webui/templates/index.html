@@ -162,6 +162,45 @@
       </div>
   </div>
 
+  <!-- Port Sharing -->
+  <div class="section share-section">
+    <div class="card">
+      <div class="card-header">
+        <h2>Port Sharing</h2>
+      </div>
+      <div class="card-body">
+        {% if share_data %}
+          <ul class="list-group">
+            {% for port, info in share_data.items() %}
+              <li class="list-group-item">
+                <div><strong>Port {{ port }}</strong></div>
+                {% if info.url %}
+                  <div><a href="{{ info.url }}" target="_blank">{{ info.url }}</a></div>
+                  <div><img src="data:image/png;base64,{{ info.qr }}" alt="QR for {{ info.url }}" /></div>
+                {% else %}
+                  <div class="text-warning">Waiting for link...</div>
+                {% endif %}
+                <form action="{{ url_for('share_stop') }}" method="post" class="d-inline">
+                  <input type="hidden" name="port" value="{{ port }}">
+                  <button type="submit" class="btn btn-danger btn-sm">Stop</button>
+                </form>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        <hr>
+        <form action="{{ url_for('share_start') }}" method="post" class="row g-2 align-items-end">
+          <div class="col-auto">
+            <label for="share_port" class="form-label">Port to Share</label>
+            <input type="number" class="form-control" id="share_port" name="port" min="1" max="65535" required>
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Share Port</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <!-- Logs -->
   <div class="section logs-section">
