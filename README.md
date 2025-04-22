@@ -12,6 +12,12 @@ A lightweight, dynamic firewall manager that “opens ports when needed, closes 
 
 ---
 
+## Screenshots
+
+![main](screenshot_01.png)
+![log](screenshot_02.png)
+![port share](screenshot_03.png)
+
 ## Table of Contents
 
 - [How It Works](#how-it-works)  
