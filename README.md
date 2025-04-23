@@ -2,6 +2,8 @@
 
 # Dynamic Port Guard
 
+**⚠️ WARNING:** This tool modifies your firewall rules and requires a default‑deny policy. Misconfiguration can lock you out of your server—always backup your iptables configuration, whitelist critical ports (e.g., SSH port 22), and ensure alternative access (console or out‑of‑band) before enabling.
+
 A lightweight, dynamic firewall manager that “opens ports when needed, closes them when not.” It consists of:
 
 1. **Core Service (`dynamic-port-guard`)**  
@@ -64,9 +66,7 @@ A lightweight, dynamic firewall manager that “opens ports when needed, closes 
 - Systemd integration for both core & Web UI  
 - Isolated Python venv for Web UI  
 - Minimal resource usage  
-- **Port Sharing:**  
-  Expose any local port via an SSH reverse tunnel to `localhost.run`.  
-  Auto‑captures `.lhr.life` URLs, updates them live, and shows a QR code.
+- **Port Sharing**: Expose any local port securely via an SSH reverse tunnel (default: `localhost.run`). The Web UI automatically captures the generated `.lhr.life` URL, updates it live through a background monitor thread, and displays a QR code for easy mobile access. **⚠️ WARNING:** Exposing services publicly can pose security risks—only share ports you trust.
 
 ---
 
@@ -172,6 +172,8 @@ sudo systemctl restart dynamic-port-guard.service
 ---
 
 ## Security Considerations
+
+> **⚠️ CRITICAL WARNING:** This tool directly manipulates `iptables` rules. A misconfiguration may lock you out of your server. Always ensure SSH (or your remote access port) is whitelisted and you have alternative access methods.
 
 - **Default‑deny** policy is required; this tool only *adds* allow rules.  
 - Services run as `root`; consider a hardened sudo setup for least privilege.  

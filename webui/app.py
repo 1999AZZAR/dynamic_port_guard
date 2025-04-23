@@ -643,10 +643,9 @@ def modify_whitelist():
 def view_log():
     config = read_config()
     log_path = config.get("LOG_FILE", DEFAULT_LOG_FILE)
-    # Show more lines on this dedicated page
     logs = read_log(lines=200)
-    # Use the dedicated template
-    return render_template("log_viewer.html", logs=logs, log_file=log_path)
+    # Always return just the log content (now used only for modal popup)
+    return logs
 
 
 @app.route("/share/start", methods=["POST"])
